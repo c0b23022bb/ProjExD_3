@@ -140,14 +140,25 @@ class Bomb:
         self.rct.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rct)
 
-
+class Score:
+    def __init__(self):
+        self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
+        self.color = (0,0,255)
+        self.score = 0
+        self.img = self.fonto.render(f"スコア: {self.score}", self.score, self.color)
+        self.rct = self.img.get_rect()
+        self.rct.center = 100,HEIGHT - 50
+    def update(self, screen: pg.Surface):
+        self.img = self.fonto.render(f"スコア:{self.score}", self.score, self.color)
+        screen.blit(self.img,self.rct)
+        
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
     beam = None
-    # bomb = Bomb((255, 0, 0), 10)
+    score = Score()
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
     clock = pg.time.Clock()
     tmr = 0
@@ -163,7 +174,9 @@ def main():
         for bomb in bombs:
             if bird.rct.colliderect(bomb.rct):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
-                bird.change_img(8, screen)
+                fonto = pg.font.Font(None, 80)
+                txt = fonto.render("Game Over", True, (255, 0, 0))
+                screen.blit(txt, [WIDTH/2-150, HEIGHT/2])
                 pg.display.update()
                 time.sleep(1)
                 return
@@ -171,21 +184,23 @@ def main():
         for i in range(len(bombs)):
             if beam is not None:
                 if bombs[i].rct.colliderect(beam.rct):
-                    bomb[i] = None
+                    bombs [i] = None
                     beam = None
-                    bird.change_img(6, screen) 
+                    bird.change_img(6, screen)
+                    score.score += 1
+        score.update(screen)
         bombs = [bomb for bomb in bombs if bomb is not None]
         
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
         if beam is not None:
             beam.update(screen)
-        if bomb is not None:
+        for bomb in bombs:
             bomb.update(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
-
+        
 
 if __name__ == "__main__":
     pg.init()
