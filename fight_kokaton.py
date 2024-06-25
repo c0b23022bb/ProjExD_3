@@ -201,7 +201,7 @@ def main():
                 time.sleep(5)
                 return
             
-        for i in range(len(bombs)):
+        for i in range(len(bombs)):#bombs分繰り返す
             if beam is not None:
                 if bombs[i].rct.colliderect(beam.rct):
                     effects.append(Explosion(bombs[i], 50))
